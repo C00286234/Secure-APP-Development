@@ -1,5 +1,6 @@
 <?php
     session_start();
+    require_once __DIR__ . '/includes/removexss.inc.php';
 
     // MITIGATION: Page Caching - Prevent browsers from caching authenticated pages
     // This ensures users cannot view cached pages after logout using back button

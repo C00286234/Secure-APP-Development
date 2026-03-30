@@ -29,12 +29,12 @@
 
                         $query = mysqli_query($conn, "SELECT * FROM loginevents");
                         while ($row = mysqli_fetch_array($query)) {
-                              // MITIGATION: Persistent XSS - Sanitize all output from database
-                              $id = htmlspecialchars($row['event_id'], ENT_QUOTES, 'UTF-8');
-                              $ipAddr = htmlspecialchars($row['ip'], ENT_QUOTES, 'UTF-8');
-                              $time = htmlspecialchars($row['timeStamp'], ENT_QUOTES, 'UTF-8');
-                              $user_id = htmlspecialchars($row['user_id'], ENT_QUOTES, 'UTF-8');
-                              $outcome = htmlspecialchars($row['outcome'], ENT_QUOTES, 'UTF-8');
+                              // MITIGATION: Persistent XSS - RemoveXSS decodes obfuscated HTML entities from database output
+                              $id = RemoveXSS($row['event_id']);
+                              $ipAddr = RemoveXSS($row['ip']);
+                              $time = RemoveXSS($row['timeStamp']);
+                              $user_id = RemoveXSS($row['user_id']);
+                              $outcome = RemoveXSS($row['outcome']);
 
                               echo "<div class='admin-content'>
                                           Entry ID: <b>$id</b>

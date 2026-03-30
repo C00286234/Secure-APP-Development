@@ -49,13 +49,15 @@
 				$conn->exec($makeUsers);
 				echo "Table 'users' created successfully<br>"; 
 
-				$makeAdmin = "INSERT INTO `sapusers` (`user_uid`, `user_pwd`, `user_admin`) VALUES ('admin', 'AdminPass1!', '1')";
+				$adminHash = password_hash('AdminPass1!', PASSWORD_BCRYPT);
+				$makeAdmin = "INSERT INTO `sapusers` (`user_uid`, `user_pwd`, `user_admin`) VALUES ('admin', '$adminHash', '1')";
 				$conn->exec($makeAdmin);
-				echo "Admin Added (Username = admin, Password =AdminPass1!<br>";
-				
-				$makeAdmin = "INSERT INTO `sapusers` (`user_uid`, `user_pwd`, `user_admin`) VALUES ('user1', 'Password1!', '0')";
-				$conn->exec($makeAdmin);
-				echo "User Added (Username = user1, Password =Password1!<br>";
+				echo "Admin Added (Username = admin, Password = AdminPass1!)<br>";
+
+				$userHash = password_hash('Password1!', PASSWORD_BCRYPT);
+				$makeUser = "INSERT INTO `sapusers` (`user_uid`, `user_pwd`, `user_admin`) VALUES ('user1', '$userHash', '0')";
+				$conn->exec($makeUser);
+				echo "User Added (Username = user1, Password = Password1!)<br>";
 				
 				//Make table to track pre-auth sessions that should be blocked for failed login attempts
 				$makeCounter = "CREATE TABLE `failedLogins`

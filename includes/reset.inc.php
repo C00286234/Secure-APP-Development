@@ -42,16 +42,19 @@ if (!isset($_GET['reset'],$_SESSION['u_uid'])) {
             $row = mysqli_fetch_assoc($result); 
 
 			
-            if (strcmp($oldpass, $row['user_pwd']) !== 0) {
+            // MITIGATION: Verify old password against bcrypt hash (consistent with login flow)
+            if (!password_verify($oldpass, $row['user_pwd'])) {
                 $_SESSION['resetError'] = "Error code 4";
                 header("Location: ../index.php");
                 exit();
             } else {
                 if ($newConfirm == $newpass) { //confirm they match
 
-                    $changePass = "UPDATE `sapusers` SET `user_pwd` = ? WHERE `user_uid` = ?"; //$newpass, $uid
+                    // MITIGATION: Hash new password with bcrypt before storing
+                    $hashedNewPass = password_hash($newpass, PASSWORD_BCRYPT);
+                    $changePass = "UPDATE `sapusers` SET `user_pwd` = ? WHERE `user_uid` = ?";
                     $stmt = $conn->prepare($changePass);
-                    $stmt->bind_param("ss", $newpass, $uid);
+                    $stmt->bind_param("ss", $hashedNewPass, $uid);
                             
                     if(!$stmt->execute()) {
                         echo "Error: " . $stmt->error;

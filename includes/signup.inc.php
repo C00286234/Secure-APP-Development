@@ -4,6 +4,7 @@
 
         session_start();
         include_once 'dbh.inc.php';
+        require_once __DIR__ . '/removexss.inc.php';
 
         $uid = $_POST['uid'];
         $pwd = $_POST['pwd'];
@@ -94,9 +95,10 @@
                         exit();
 
                     } else {
-                        $hashedPWD = $pwd;
+                        // MITIGATION: Insecure Password Storage - Hash password before storing
+                        $hashedPWD = password_hash($pwd, PASSWORD_BCRYPT);
 
-                        $sql = "INSERT INTO `sapusers` (`user_uid`, `user_pwd`) VALUES (?, ?)"; 
+                        $sql = "INSERT INTO `sapusers` (`user_uid`, `user_pwd`) VALUES (?, ?)";
                         $stmt = $conn->prepare($sql);
                         $stmt->bind_param("ss", $uid, $hashedPWD);
                         
@@ -110,12 +112,14 @@
                         $stmt->bind_param("s", $ipAddr);
                         $stmt->execute();
 
-                        $_SESSION['register'] = "You've successfully registered as " . htmlspecialchars($uid, ENT_QUOTES, 'UTF-8') . ".";
+                        $_SESSION['register'] = "You've successfully registered as " . RemoveXSS($uid) . ".";
 
                         header("Location: ../index.php");
                         exit();
 
                     }
-                }   
+                }
         }
     }
+
+// RemoveXSS loaded via require_once -> includes/removexss.inc.php

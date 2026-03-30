@@ -2,6 +2,7 @@
 	include_once 'header.php';
 	if (!isset($_SESSION['u_id'])) {
 	header("Location: home.php");
+	exit();
 	} else {
 		$user_id = $_SESSION['u_id']; 
 		$user_uid = $_SESSION['u_uid'];
@@ -22,10 +23,11 @@
 		echo "You're logged in as " . cleanChars($user_uid);
 	}
 
-	// MITIGATION: XSS - Sanitize output using htmlspecialchars
+	// MITIGATION: XSS - RemoveXSS decodes obfuscated HTML entities to neutralize encoded XSS payloads
+	// RemoveXSS loaded via header.php -> includes/removexss.inc.php
 	function cleanChars($val)
 	{
-		return htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
+		return RemoveXSS($val);
 	}
 ?>
 
@@ -90,10 +92,10 @@ Objectives
 
 					if (stristr(php_uname('s'), 'Windows NT')) {
 						$cmd = shell_exec('ping ' . $safeTarget);
-						echo '<pre>'.htmlspecialchars($cmd, ENT_QUOTES, 'UTF-8').'</pre>';
+						echo '<pre>'.RemoveXSS($cmd).'</pre>';
 					} else {
 						$cmd = shell_exec('ping -c 3 ' . $safeTarget);
-						echo '<pre>'.htmlspecialchars($cmd, ENT_QUOTES, 'UTF-8').'</pre>';
+						echo '<pre>'.RemoveXSS($cmd).'</pre>';
 					}
 				} else {
 					echo '<pre>Invalid target. Please enter a valid IP address or hostname.</pre>';

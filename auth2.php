@@ -2,6 +2,7 @@
 	include_once 'header.php';
 	if (!isset($_SESSION['u_id'])) {
 	header("Location: home.php");
+	exit();
 	} else {
 		$user_id = $_SESSION['u_id'];
 		$user_uid = $_SESSION['u_uid'];
@@ -33,13 +34,15 @@
 
 					if ($realPath && strpos($realPath, $allowedDir) === 0 && file_exists($realPath)) {
 						$FileData = file_get_contents($realPath);
-						echo htmlspecialchars($FileData, ENT_QUOTES, 'UTF-8');
+						echo RemoveXSS($FileData);
 					} else {
 						echo "File not found.";
 					}
 				} else {
 					echo "Access denied. File not in allowed list.";
 				}
+
+				// RemoveXSS loaded via header.php -> includes/removexss.inc.php
 ?>
             </div>
         </section>
